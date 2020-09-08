@@ -1,0 +1,20 @@
+﻿@page "/counter"
+@inject TimerBlazor.Services.Counter compteur
+<h1>Counter</h1>
+
+<p>Current count: @compteur.nombre</p>
+
+
+
+@code {
+    protected override void OnInitialized()
+    {
+        compteur.OnChange += Refresh;
+    }
+        private void Refresh()
+        {
+            base.InvokeAsync(() => {
+                StateHasChanged();
+            });
+        }
+}

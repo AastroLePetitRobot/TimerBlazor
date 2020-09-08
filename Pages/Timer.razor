@@ -1,0 +1,110 @@
+﻿@page "/"
+@inject TimerBlazor.Services.Counter compteurs
+@using System;
+@using System.Timers;
+
+<h1>Timer</h1>
+
+Welcome to your timer.
+
+
+<p>Veuillez rentrer un nombre à décrémenter</p>
+<input type="number" name="nombre" placeholder="Nombre" @bind="compteurs.nombre" />
+
+<p>Veuillez rentrer le pas pour décrémenter</p>
+<input type="number" name="pas" placeholder="Pas" @bind="compteurs.pas" />
+<p>Veuillez saisir le délai du timer en seconde</p>
+<input type="number" name="interval" placeholder="Interval" @bind="interval" />
+<button type="submit" class="btn btn-primary" @onclick="(async ()=> {InitTimer();})">Decrémente</button>
+<button type="submit" class="btn btn-primary" @onclick="(()=> {Stop();})">Stop</button>
+<p>@message</p>
+<p>Current number: @compteurs.nombre</p>
+<p>Current pas: @compteurs.pas</p>
+<p>Current interval @interval</p>
+
+@code{
+
+    private string message;
+    private int interval=0;
+    private volatile bool _isStopped = false;
+    System.Timers.Timer timer1 = new System.Timers.Timer();
+
+    private bool check()
+    {
+        message = null;
+        bool error = true;
+        if (compteurs.nombre <= 0)
+        {
+            error = false;
+            message += "Nombre inférieur ou égal à 0 \n";
+            StateHasChanged();
+        }
+        if (compteurs.pas <= 0)
+        {
+            error = false;
+            message += "Message inférieur ou égal à 0 \n";
+            StateHasChanged();
+        }
+        if (interval <= 0)
+        {
+            error = false;
+            message += "Intervale inférieur ou égal à 0 \n";
+            StateHasChanged();
+        }
+        return error;
+    }
+
+
+    public void InitTimer()
+    {
+        if(check()==true){
+
+
+            timer1.Interval = interval * 1000;
+            timer1.Elapsed += Timer1Tick;
+            timer1.AutoReset=false;
+            timer1.Start();
+        }
+        else
+        {
+            message += "Impossible de lancer le timer veuillez changer les valeurs qui ne fonctionne pas";
+            StateHasChanged();
+        }
+    }
+
+
+    private void Timer1Tick(Object source, ElapsedEventArgs e)
+    {
+        InvokeAsync(()=> {
+            compteurs.Decrement();
+            timer1.Start();
+            if (compteurs.nombre <= 0)
+                timer1.Stop();
+            StateHasChanged();
+        });
+    }
+
+
+
+    private void Stop()
+    {
+
+        timer1.Enabled = false;
+        timer1.Close();
+    }
+
+
+    protected override void OnInitialized()
+    {
+
+        compteurs.OnChange += Refresh;
+
+    }
+    private void Refresh()
+    {
+        base.InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }
+}
