@@ -11,7 +11,7 @@
     {
         compteur.OnChange += Refresh;
     }
-        private void Refresh()
+        private void Refresh() /*pour changer les donnée du compteur tout au long du timer*/
         {
             base.InvokeAsync(() => {
                 StateHasChanged();

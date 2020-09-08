@@ -8,7 +8,7 @@ namespace TimerBlazor.Services
 {
     public class Counter
     {
-        public int nombre
+         public  int nombre
         {
             get;
 
